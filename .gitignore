@@ -1,0 +1,7 @@
+output/
+processed_builds.txt
+app_include_list.txt
+*.log
+
+.python-version
+*.pyc

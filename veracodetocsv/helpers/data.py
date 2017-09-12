@@ -100,17 +100,17 @@ class DataLoader:
         for flaw_element in flaw_elements:
             if build_type == "static":
                 flaws.append(models.StaticFlaw(flaw_element.attrib["issueid"], flaw_element.attrib["date_first_occurrence"],
-                                               flaw_element.attrib["severity"], flaw_element.attrib["exploitLevel"],
-                                               flaw_element.attrib["cweid"], flaw_element.attrib["remediationeffort"],
-                                               flaw_element.attrib["affects_policy_compliance"], flaw_element.attrib["categoryname"],
-                                               flaw_element.attrib["module"], flaw_element.attrib["sourcefile"], flaw_element.attrib["line"],
-                                               flaw_element.attrib["remediation_status"], flaw_element.attrib["mitigation_status_desc"]))
+                                               flaw_element.attrib["severity"], flaw_element.attrib["cweid"],
+                                               flaw_element.attrib["categoryname"], flaw_element.attrib["affects_policy_compliance"],
+                                               flaw_element.attrib["remediationeffort"], flaw_element.attrib["remediation_status"],
+                                               flaw_element.attrib["mitigation_status_desc"], flaw_element.attrib["exploitLevel"],
+                                               flaw_element.attrib["module"], flaw_element.attrib["sourcefile"], flaw_element.attrib["line"]))
             elif build_type == "dynamic":
                 flaws.append(models.DynamicFlaw(flaw_element.attrib["issueid"], flaw_element.attrib["date_first_occurrence"],
                                                 flaw_element.attrib["severity"], flaw_element.attrib["cweid"],
-                                                flaw_element.attrib["remediationeffort"], flaw_element.attrib["affects_policy_compliance"],
-                                                flaw_element.attrib["categoryname"], flaw_element.attrib["url"],
-                                                flaw_element.attrib["remediation_status"], flaw_element.attrib["mitigation_status_desc"]))
+                                                flaw_element.attrib["categoryname"], flaw_element.attrib["affects_policy_compliance"],
+                                                flaw_element.attrib["remediationeffort"], flaw_element.attrib["remediation_status"],
+                                                flaw_element.attrib["mitigation_status_desc"], flaw_element.attrib["url"]))
         return flaws
 
     def get_data(self, include_static_builds=True, include_dynamic_builds=True, app_include_list=None, include_sandboxes=False):

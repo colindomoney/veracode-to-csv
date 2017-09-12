@@ -21,7 +21,7 @@ class Flaw(object):
                 "remediation_status", "mitigation_status_desc"]
 
     def to_list(self):
-        return [self.__getattribute__(key) for key in Flaw.to_headers()]
+        return [getattr(self, key) for key in Flaw.to_headers()]
 
     def __str__(self):
         return "{}, {}, {}, {}, {}, {}, {}, {}, {}".format(self.id, self.date_first_occurrence, self.severity, self.cweid,
@@ -31,11 +31,12 @@ class Flaw(object):
 
 class StaticFlaw(Flaw):
     """A class that represents a static analysis flaw"""
-    def __init__(self, id, date_first_occurrence, severity, exploitLevel, cweid,
-                 remediationeffort, affects_policy_compliance, categoryname, module,
-                 sourcefile, line, remediation_status, mitigation_status_desc):
+    def __init__(self, id, date_first_occurrence, severity, cweid,
+                 categoryname, affects_policy_compliance, remediationeffort,
+                 remediation_status, mitigation_status_desc,
+                 exploitLevel, module, sourcefile, line):
         super(StaticFlaw, self).__init__(id, date_first_occurrence, severity, cweid,
-                                         remediationeffort, affects_policy_compliance, categoryname,
+                                         categoryname, affects_policy_compliance, remediationeffort,
                                          remediation_status, mitigation_status_desc)
         self.exploitLevel = exploitLevel
         self.module = module
@@ -47,7 +48,7 @@ class StaticFlaw(Flaw):
         return super(StaticFlaw, cls).to_headers() + ["exploitLevel", "module", "sourcefile", "line"]
 
     def to_list(self):
-        return [self.__getattribute__(key) for key in StaticFlaw.to_headers()]
+        return [getattr(self, key) for key in StaticFlaw.to_headers()]
 
     def __str__(self):
         return super(StaticFlaw, self).__str__() + ", {}, {}, {}, {}".format(self.exploitLevel, self.module,
@@ -57,10 +58,11 @@ class StaticFlaw(Flaw):
 class DynamicFlaw(Flaw):
     """A class that represents a dynamic analysis flaw"""
     def __init__(self, id, date_first_occurrence, severity, cweid,
-                 remediationeffort, affects_policy_compliance, categoryname, url,
-                 remediation_status, mitigation_status_desc):
+                 categoryname, affects_policy_compliance, remediationeffort,
+                 remediation_status, mitigation_status_desc,
+                 url):
         super(DynamicFlaw, self).__init__(id, date_first_occurrence, severity, cweid,
-                                          remediationeffort, affects_policy_compliance, categoryname,
+                                          categoryname, affects_policy_compliance, remediationeffort,
                                           remediation_status, mitigation_status_desc)
         self.url = url
 
@@ -69,7 +71,7 @@ class DynamicFlaw(Flaw):
         return super(DynamicFlaw, cls).to_headers() + ["url"]
 
     def to_list(self):
-        return [self.__getattribute__(key) for key in DynamicFlaw.to_headers()]
+        return [getattr(self, key) for key in DynamicFlaw.to_headers()]
 
     def __str__(self):
         return super(DynamicFlaw, self).__str__() + ", {}".format(self.url)
@@ -89,7 +91,7 @@ class Build(object):
         return ["id", "name", "type", "policy_updated_date"]
 
     def to_list(self):
-        return [self.__getattribute__(key) for key in Build.to_headers()]
+        return [getattr(self, key) for key in Build.to_headers()]
 
     def __str__(self):
         return "{}, {}, {}, {}".format(self.id, self.name, self.type, self.policy_updated_date)
@@ -106,7 +108,7 @@ class StaticBuild(Build):
         return super(StaticBuild, cls).to_headers()
 
     def to_list(self):
-        return [self.__getattribute__(key) for key in StaticBuild.to_headers()]
+        return [getattr(self, key) for key in StaticBuild.to_headers()]
 
     def __str__(self):
         return super(StaticBuild, self).__str__()
@@ -123,7 +125,7 @@ class DynamicBuild(Build):
         return super(DynamicBuild, cls).to_headers()
 
     def to_list(self):
-        return [self.__getattribute__(key) for key in DynamicBuild.to_headers()]
+        return [getattr(self, key) for key in DynamicBuild.to_headers()]
 
     def __str__(self):
         return super(DynamicBuild, self).__str__()
@@ -141,7 +143,7 @@ class Sandbox(object):
         return ["id", "name"]
 
     def to_list(self):
-        return [self.__getattribute__(key) for key in Sandbox.to_headers()]
+        return [getattr(self, key) for key in Sandbox.to_headers()]
 
     def __str__(self):
         return "{}, {}".format(self.id, self.name)
@@ -161,7 +163,7 @@ class App(object):
         return ["id", "name", "business_unit"]
 
     def to_list(self):
-        return [self.__getattribute__(key) for key in App.to_headers()]
+        return [getattr(self, key) for key in App.to_headers()]
 
     def __str__(self):
         return "{}, {}, {}".format(self.id, self.name, self.business_unit)

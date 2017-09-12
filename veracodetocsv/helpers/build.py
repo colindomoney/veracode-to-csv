@@ -41,13 +41,9 @@ class BuildTools:
                     return current_build_policy_updated > last_build_policy_updated
 
     def update_and_save_processed_builds_file(self, app_id, build_id, build_policy_updated_date):
-        build_data = {
-            "policy_updated_date": build_policy_updated_date
-        }
+        build_data = {"policy_updated_date": build_policy_updated_date}
         if app_id not in self.processed_builds:
-            self.processed_builds[app_id] = {
-                build_id: build_data
-            }
+            self.processed_builds[app_id] = {build_id: build_data}
         else:
             self.processed_builds[app_id][build_id] = build_data
         try:

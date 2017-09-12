@@ -8,14 +8,14 @@ import codecs
 import logging
 from datetime import datetime
 
-import config
-
 import helpers.log
 import helpers.api
 import helpers.data
 import helpers.build
 import helpers.unicodecsv
 from helpers.exceptions import VeracodeError
+
+import config
 
 
 def main():

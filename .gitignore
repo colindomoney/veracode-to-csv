@@ -3,7 +3,7 @@ processed_builds.txt
 app_include_list.txt
 *.log
 
-tests/.cache/
+.cache/
 
 .python-version
 *.pyc

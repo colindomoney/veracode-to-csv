@@ -1,3 +1,5 @@
+(https://travis-ci.org/ctcampbell/veracode-to-csv.svg?branch=master)
+
 This is not an official Veracode project. The Veracode support team will not be able to assist with troubleshooting. Please raise an issue on this project for improvements or bug fixes.
 
 # Install

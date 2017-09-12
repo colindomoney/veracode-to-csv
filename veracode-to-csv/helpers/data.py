@@ -122,7 +122,7 @@ class DataLoader:
             app_info = self._get_app_info(app.id)
             app.business_unit = app_info["business_unit"]
             builds = self._get_builds(app.id, include_static_builds, include_dynamic_builds)
-            app.builds = [build for build in builds if self.build_tools.build_should_be_processed(app.name, build.id, build.policy_updated_date)]
+            app.builds = [build for build in builds if self.build_tools.build_should_be_processed(app.id, build.id, build.policy_updated_date)]
             for build in app.builds:
                 build.flaws = self._get_flaws(build.id, build.type)
             if include_sandboxes:

@@ -1,4 +1,6 @@
-import veracodetocsv.helpers.models as models
+from __future__ import absolute_import
+
+from veracodetocsv.helpers import models
 
 
 def test_app_model():

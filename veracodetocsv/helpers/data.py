@@ -1,14 +1,21 @@
 # Purpose:  Convert Veracode XML elements to Python objects.
 
+import sys
 import xml.etree.ElementTree as ETree
-from StringIO import StringIO
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import BytesIO
 
-import models
+from . import models
 from .exceptions import VeracodeError, VeracodeAPIError
 
 
 def parse_and_remove_xml_namespaces(xml_string):
-    it = ETree.iterparse(StringIO(xml_string))
+    if sys.version_info >= (3,):
+        it = ETree.iterparse(BytesIO(xml_string))
+    else:
+        it = ETree.iterparse(StringIO(xml_string))
     for _, el in it:
         if "}" in el.tag:
             el.tag = el.tag.split("}", 1)[1]  # strip all namespaces

@@ -6,11 +6,11 @@ This is not an official Veracode project. The Veracode support team will not be 
 
 Download latest release from [releases/latest](https://github.com/ctcampbell/veracode-to-csv/releases/latest)
 
-Requires Python 2.7
+Supports Python 2.7 and 3.6
 
 Install Veracode module veracode-api-signing (speak to your Veracode Solution Architect for this file)
 
-    pip install veracode_api_signing-16.12.4-py2-none-any.whl
+    pip install veracode_api_signing-17.0.0-py2.py3-none-any.whl
 
 API credentials must be enabled on a Veracode account and placed in `~/.veracode/credentials`
 
@@ -57,7 +57,7 @@ Configuration is done in config.py
 
 # Run
 
-    python veracodetocsv.py
+    python veracodetocsv/veracodetocsv.py
     
 A text file `processed_builds.txt` keeps track of which builds have been successfully processed.
 

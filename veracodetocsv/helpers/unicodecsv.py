@@ -1,6 +1,11 @@
 # Purpose:  CSV utilities
 
-import cStringIO
+try:
+    import cStringIO
+except ImportError:
+    # import will fail on py3, but that's not a problem
+    pass
+import sys
 import codecs
 import csv
 import logging
@@ -37,8 +42,11 @@ class UnicodeWriter:
 def create_csv(row_list, filepath):
     """Create a new CSV file from a list of rows."""
     try:
-        with open(filepath, 'wb') as f:
-            wr = UnicodeWriter(f, quoting=csv.QUOTE_NONE, escapechar='\\')
+        with open(filepath, 'w') as f:
+            if sys.version_info >= (3,):
+                wr = csv.writer(f, quoting=csv.QUOTE_NONE, escapechar='\\')
+            else:
+                wr = UnicodeWriter(f, quoting=csv.QUOTE_NONE, escapechar='\\')
             wr.writerows(row_list)
     except IOError as e:
         logging.exception("Error writing csv file")

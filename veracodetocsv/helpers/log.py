@@ -16,4 +16,5 @@ def setup_logging(debug=False):
         logging.basicConfig(format=format_string, filename=logging_filename, level=logging.DEBUG)
     else:
         logging.basicConfig(format=format_string, filename=logging_filename, level=logging.INFO)
-        logging.getlogger("requests").setLevel(logging.WARNING)
+        requests_logger = logging.getLogger("requests")
+        requests_logger.setLevel(logging.WARNING)

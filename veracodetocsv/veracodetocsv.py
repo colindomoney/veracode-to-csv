@@ -1,5 +1,7 @@
 # Purpose:  This script outputs one CSV file per scan per application profile visible in a Veracode platform account.
 #           The CSV files can be imported into a SIEM tool such as splunk. Configuration options are set in config.py
+from __future__ import print_function
+from __future__ import absolute_import
 
 import os
 import re
@@ -8,14 +10,13 @@ import codecs
 import logging
 from datetime import datetime
 
+import config
 import helpers.log
 import helpers.api
 import helpers.data
 import helpers.build
 import helpers.unicodecsv
-from helpers.exceptions import VeracodeError
-
-import config
+import helpers.exceptions
 
 
 def main():
@@ -29,19 +30,21 @@ def main():
 
     helpers.log.setup_logging(debug_logging)
 
+    logging.log(logging.INFO, "Starting data download")
+
     if not os.path.exists(output_directory):
         try:
             os.makedirs(output_directory + "/static")
             os.makedirs(output_directory + "/dynamic")
         except OSError:
             logging.exception("Cannot create output directory")
-            print "Cannot create output directory, check log file for details."
+            print("Cannot create output directory, check log file for details.")
             sys.exit(2)
 
     try:
         build_tools = helpers.build.BuildTools()
-    except VeracodeError:
-        print "Error getting processed build history, check log file for details."
+    except helpers.exceptions.VeracodeError:
+        print("Error getting processed build history, check log file for details.")
         sys.exit(2)
 
     veracode_api = helpers.api.VeracodeAPI(proxies=proxies)
@@ -53,15 +56,15 @@ def main():
                 app_include_list = f.read().splitlines()
         except (IOError, UnicodeDecodeError):
             logging.exception("Error opening app include list file")
-            print "Error opening app include list file, check log file for details."
+            print("Error opening app include list file, check log file for details.")
             sys.exit(2)
     else:
         app_include_list = []
 
     try:
         data = data_loader.get_data(include_static_builds, include_dynamic_builds, app_include_list, include_sandboxes)
-    except VeracodeError:
-        print "Failed to get app data, check log file for details."
+    except helpers.exceptions.VeracodeError:
+        print("Failed to get app data, check log file for details.")
         sys.exit(2)
 
     def make_filepath(app, build, sandbox=None):
@@ -88,13 +91,15 @@ def main():
 
     builds_processed = 0
 
+    logging.log(logging.INFO, "Writing csv files")
+
     for app in data:
         # Iterate over policy builds
         for build in app.builds:
             try:
                 process_build(app, build)
                 builds_processed += 1
-            except VeracodeError:
+            except helpers.exceptions.VeracodeError:
                 logging.exception("Failed to process build")
 
         # Iterate over sandbox builds
@@ -104,10 +109,10 @@ def main():
                     try:
                         process_build(app, build, sandbox)
                         builds_processed += 1
-                    except VeracodeError:
+                    except helpers.exceptions.VeracodeError:
                         logging.exception("Failed to process build")
 
-    print "Processed {} builds".format(builds_processed)
+    print("Processed {} builds".format(builds_processed))
 
 
 if __name__ == "__main__":

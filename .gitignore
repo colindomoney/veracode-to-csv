@@ -3,7 +3,9 @@ processed_builds.txt
 app_include_list.txt
 *.log
 
+build/
+dist/
 .cache/
-
+*.egg-info/
 .python-version
 *.pyc

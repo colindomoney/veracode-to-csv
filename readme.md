@@ -1,4 +1,4 @@
-![travis-ci build status](https://travis-ci.org/ctcampbell/veracode-to-csv.svg?branch=master)
+[![travis-ci build status](https://travis-ci.org/ctcampbell/veracode-to-csv.svg?branch=master)](https://travis-ci.org/ctcampbell/veracode-to-csv#)
 
 This is not an official Veracode project. The Veracode support team will not be able to assist with troubleshooting. Please raise an issue on this project for improvements or bug fixes.
 

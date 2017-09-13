@@ -1,3 +1,6 @@
+# Purpose:  Data models
+
+
 class Flaw(object):
     """A class that represents a flaw"""
     def __init__(self, id, date_first_occurrence, severity, cweid,

@@ -1,3 +1,5 @@
+# Purpose:  Convert Veracode XML elements to Python objects.
+
 import xml.etree.ElementTree as ETree
 from StringIO import StringIO
 

@@ -1,3 +1,5 @@
+# Purpose:  Log utilities
+
 import logging
 from datetime import datetime
 

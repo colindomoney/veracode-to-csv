@@ -1,3 +1,5 @@
+# Purpose:  CSV utilities
+
 import cStringIO
 import codecs
 import csv

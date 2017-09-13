@@ -1,3 +1,6 @@
+# Purpose:  Exceptions
+
+
 class VeracodeError(Exception):
     """Raised when something goes wrong"""
     pass

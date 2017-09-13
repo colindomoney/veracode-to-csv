@@ -1,4 +1,4 @@
-[![travis-ci build status](https://travis-ci.org/ctcampbell/veracode-to-csv.svg?branch=master)](https://travis-ci.org/ctcampbell/veracode-to-csv#)
+[![travis-ci build status](https://travis-ci.org/ctcampbell/veracode-to-csv.svg?branch=master)](https://travis-ci.org/ctcampbell/veracode-to-csv)
 
 This is not an official Veracode project. The Veracode support team will not be able to assist with troubleshooting. Please raise an issue on this project for improvements or bug fixes.
 
@@ -30,27 +30,29 @@ Install other dependencies
 
 Configuration is done in config.py
 
-    # Logging
+    # Debug logging, default is false.
     debug_logging = True
     
-    # Directory to output .csv files
+    # Directory to output .csv files, default is "output".
     output_directory = "output"
     
     # UTF-8 encoded file containing list of applications to include.
-    # Note - an empty file will include all application profiles
+    # Default is to include all applications.
+    # Note - an empty file will include all application profiles.
     app_include_list = "app_include_list.txt"
     
-    # Include static/dynamic flaws
+    # Include static/dynamic flaws, default is true for both.
     include_static_flaws = True
     include_dynamic_flaws = True
     
-    # Include sandboxes
+    # Include sandboxes, default is true.
     include_sandboxes = True
     
-    # Add headers to csv files
+    # Add headers to csv files, default is true.
     include_csv_headers = True
    
-    # Proxy configuration, see http://docs.python-requests.org/en/master/user/advanced/#proxies for options
+    # Proxy configuration, default is no proxy.
+    # See http://docs.python-requests.org/en/master/user/advanced/#proxies for options.
     proxies = {"https": "http://user:pass@10.10.10.10:8080/"}
 
 # Run

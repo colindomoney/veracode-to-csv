@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-from .context import models
+from veracodetocsv.helpers import models
 
 
 def test_app_model():

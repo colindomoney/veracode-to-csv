@@ -11,12 +11,12 @@ import logging
 from datetime import datetime
 
 import config
-import helpers.log
-import helpers.api
-import helpers.data
-import helpers.build
-import helpers.unicodecsv
-import helpers.exceptions
+from helpers import log
+from helpers import api
+from helpers import unicodecsv
+from helpers.data import DataLoader
+from helpers.build import BuildTools
+from helpers.exceptions import VeracodeError
 
 
 def main():
@@ -28,9 +28,10 @@ def main():
     proxies = getattr(config, "proxies", None)
     debug_logging = getattr(config, "debug_logging", False)
 
-    helpers.log.setup_logging(debug_logging)
+    log.setup_logging(debug_logging)
 
     logging.log(logging.INFO, "Starting data download")
+    print("Starting data download")
 
     if not os.path.exists(output_directory):
         try:
@@ -42,13 +43,13 @@ def main():
             sys.exit(2)
 
     try:
-        build_tools = helpers.build.BuildTools()
-    except helpers.exceptions.VeracodeError:
+        build_tools = BuildTools()
+    except VeracodeError:
         print("Error getting processed build history, check log file for details.")
         sys.exit(2)
 
-    veracode_api = helpers.api.VeracodeAPI(proxies=proxies)
-    data_loader = helpers.data.DataLoader(veracode_api, build_tools)
+    veracode_api = api.VeracodeAPI(proxies=proxies)
+    data_loader = DataLoader(veracode_api, build_tools)
 
     if hasattr(config, "app_include_list"):
         try:
@@ -63,7 +64,7 @@ def main():
 
     try:
         data = data_loader.get_data(include_static_builds, include_dynamic_builds, app_include_list, include_sandboxes)
-    except helpers.exceptions.VeracodeError:
+    except VeracodeError:
         print("Failed to get app data, check log file for details.")
         sys.exit(2)
 
@@ -86,12 +87,13 @@ def main():
             else:
                 flaw_rows.append(app.to_list() + build.to_list() + flaw.to_list() + sandbox.to_list())
         filepath = make_filepath(app, build, sandbox)
-        helpers.unicodecsv.create_csv(flaw_rows, filepath)
+        unicodecsv.create_csv(flaw_rows, filepath)
         build_tools.update_and_save_processed_builds_file(app.id, build.id, build.policy_updated_date)
 
     builds_processed = 0
 
     logging.log(logging.INFO, "Writing csv files")
+    print("Writing csv files")
 
     for app in data:
         # Iterate over policy builds
@@ -99,7 +101,7 @@ def main():
             try:
                 process_build(app, build)
                 builds_processed += 1
-            except helpers.exceptions.VeracodeError:
+            except VeracodeError:
                 logging.exception("Failed to process build")
 
         # Iterate over sandbox builds
@@ -109,7 +111,7 @@ def main():
                     try:
                         process_build(app, build, sandbox)
                         builds_processed += 1
-                    except helpers.exceptions.VeracodeError:
+                    except VeracodeError:
                         logging.exception("Failed to process build")
 
     print("Processed {} builds".format(builds_processed))

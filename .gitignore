@@ -3,6 +3,7 @@ processed_builds.txt
 app_include_list.txt
 *.log
 
+.tox/
 build/
 dist/
 .cache/

@@ -35,8 +35,8 @@ def main():
 
     if not os.path.exists(output_directory):
         try:
-            os.makedirs(output_directory + "/static")
-            os.makedirs(output_directory + "/dynamic")
+            os.makedirs(os.path.join(output_directory, "static"))
+            os.makedirs(os.path.join(output_directory, "dynamic"))
         except OSError:
             logging.exception("Cannot create output directory")
             print("Cannot create output directory, check log file for details.")
@@ -69,13 +69,14 @@ def main():
         sys.exit(2)
 
     def make_filepath(app, build, sandbox=None):
-        scan_type_output_directory = output_directory + "/{}".format(build.type)
+        scan_type_output_directory = os.path.join(output_directory, build.type)
         clean_app_name = re.sub(r'(?u)[^-\w]', '', app.name.strip())
         now = datetime.now().strftime("%Y-%m-%d-%H%M%S")
         if sandbox is None:
-            return "{}/{}-{}-{}.csv".format(scan_type_output_directory, clean_app_name, build.id, now)
+            filename = "{}-{}-{}.csv".format(clean_app_name, build.id, now)
         else:
-            return "{}/{}-{}-{}-{}.csv".format(scan_type_output_directory, clean_app_name, sandbox.id, build.id, now)
+            filename = "{}-{}-{}-{}.csv".format(clean_app_name, sandbox.id, build.id, now)
+        return os.path.join(scan_type_output_directory, filename)
 
     def process_build(app, build, sandbox=None):
         flaw_rows = []
@@ -92,8 +93,8 @@ def main():
 
     builds_processed = 0
 
-    logging.log(logging.INFO, "Writing csv files")
-    print("Writing csv files")
+    logging.log(logging.INFO, "Writing CSV files")
+    print("Writing CSV files")
 
     for app in data:
         # Iterate over policy builds

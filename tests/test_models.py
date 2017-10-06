@@ -29,8 +29,8 @@ def test_dynamic_build_model():
     assert build.name == "test-build"
     assert build.policy_updated_date == "2017-01-01T00:00:00"
     assert build.type == "dynamic"
-    assert build.to_headers() == ["id", "name", "type", "policy_updated_date"]
-    assert build.to_list() == ["1", "test-build", "dynamic", "2017-01-01T00:00:00"]
+    assert build.to_headers() == ["id", "name", "type", "policy_updated_date", "published_date"]
+    assert build.to_list() == ["1", "test-build", "dynamic", "2017-01-01T00:00:00", None]
 
 
 def test_static_build_model():
@@ -40,13 +40,13 @@ def test_static_build_model():
     assert build.name == "test-build"
     assert build.policy_updated_date == "2017-01-01T00:00:00"
     assert build.type == "static"
-    assert build.to_headers() == ["id", "name", "type", "policy_updated_date"]
-    assert build.to_list() == ["1", "test-build", "static", "2017-01-01T00:00:00"]
+    assert build.to_headers() == ["id", "name", "type", "policy_updated_date", "published_date"]
+    assert build.to_list() == ["1", "test-build", "static", "2017-01-01T00:00:00", None]
 
 
 def test_dynamic_flaw_model():
     flaw = models.DynamicFlaw("1", "2017-01-01T00:00:00", "5", "78", "Command Injection",
-                             "true", "3", "New", "Not Mitigated", "http://example.com/test")
+                              "true", "3", "New", "Not Mitigated", "http://example.com/test")
 
     assert flaw.id == "1"
     assert flaw.date_first_occurrence == "2017-01-01T00:00:00"

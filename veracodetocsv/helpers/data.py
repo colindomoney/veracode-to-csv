@@ -86,13 +86,13 @@ class DataLoader:
         return builds
 
     def _get_build_info(self, app_id, build_id, sandbox_id=None):
-        """Returns a dict holding build info"""
+        """Returns an XML element holding build info"""
         try:
             build_info_xml = self.api.get_build_info(app_id, build_id, sandbox_id)
         except VeracodeAPIError as e:
             raise VeracodeError(e)
         build_info_root_element = parse_and_remove_xml_namespaces(build_info_xml)
-        return build_info_root_element.find("build").attrib
+        return build_info_root_element.find("build")
         
     def _get_flaws(self, build_id, build_type):
         """Returns a list of flaws"""
@@ -133,12 +133,18 @@ class DataLoader:
             builds = self._get_builds(app.id, include_static_builds, include_dynamic_builds)
             app.builds = [build for build in builds if self.build_tools.build_should_be_processed(app.id, build.id, build.policy_updated_date)]
             for build in app.builds:
+                analysis_unit_attrib = self._get_build_info(app.id, build.id).find("analysis_unit").attrib
+                if "published_date" in analysis_unit_attrib:
+                    build.published_date = analysis_unit_attrib["published_date"][:-6]
                 build.flaws = self._get_flaws(build.id, build.type)
             if include_sandboxes:
                 app.sandboxes = self._get_sandboxes(app.id)
                 for sandbox in app.sandboxes:
                     sandbox.builds = self._get_builds(app.id, include_static_builds, include_dynamic_builds, sandbox.id)
                     for build in sandbox.builds:
+                        analysis_unit_attrib = self._get_build_info(app.id, build.id, sandbox.id).find("analysis_unit").attrib
+                        if "published_date" in analysis_unit_attrib:
+                            build.published_date = analysis_unit_attrib["published_date"][:-6]
                         build.flaws = self._get_flaws(build.id, build.type)
         return apps
 

@@ -82,28 +82,29 @@ class DynamicFlaw(Flaw):
 
 class Build(object):
     """A class that represents a build"""
-    def __init__(self, id, name, policy_updated_date, flaws=None):
+    def __init__(self, id, name, policy_updated_date, published_date=None, flaws=None):
         self.id = id
         self.name = name
         self.policy_updated_date = policy_updated_date
+        self.published_date = published_date
         self.flaws = flaws
         self.type = None
 
     @classmethod
     def to_headers(cls):
-        return ["id", "name", "type", "policy_updated_date"]
+        return ["id", "name", "type", "policy_updated_date", "published_date"]
 
     def to_list(self):
         return [getattr(self, key) for key in Build.to_headers()]
 
     def __str__(self):
-        return "{}, {}, {}, {}".format(self.id, self.name, self.type, self.policy_updated_date)
+        return "{}, {}, {}, {}, {}".format(self.id, self.name, self.type, self.policy_updated_date, self.published_date)
 
 
 class StaticBuild(Build):
     """A class that represents a static analysis build"""
-    def __init__(self, id, name, policy_updated_date, flaws=None):
-        super(StaticBuild, self).__init__(id, name, policy_updated_date, flaws)
+    def __init__(self, id, name, policy_updated_date, published_date=None, flaws=None):
+        super(StaticBuild, self).__init__(id, name, policy_updated_date, published_date, flaws)
         self.type = "static"
 
     @classmethod
@@ -119,8 +120,8 @@ class StaticBuild(Build):
 
 class DynamicBuild(Build):
     """A class that represents a dynamic analysis build"""
-    def __init__(self, id, name, policy_updated_date, flaws=None):
-        super(DynamicBuild, self).__init__(id, name, policy_updated_date, flaws)
+    def __init__(self, id, name, policy_updated_date, published_date=None, flaws=None):
+        super(DynamicBuild, self).__init__(id, name, policy_updated_date, published_date, flaws)
         self.type = "dynamic"
 
     @classmethod

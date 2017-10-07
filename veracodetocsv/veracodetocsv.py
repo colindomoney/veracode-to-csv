@@ -71,7 +71,7 @@ def main():
     def make_filepath(app, build, sandbox=None):
         scan_type_output_directory = os.path.join(output_directory, build.type)
         clean_app_name = re.sub(r'(?u)[^-\w]', '', app.name.strip())
-        now = datetime.now().strftime("%Y-%m-%d-%H%M%S")
+        now = datetime.utcnow().strftime("%Y-%m-%d-%H%M%S")
         if sandbox is None:
             filename = "{}-{}-{}.csv".format(clean_app_name, build.id, now)
         else:

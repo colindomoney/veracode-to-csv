@@ -44,9 +44,9 @@ def create_csv(row_list, filepath):
     try:
         with open(filepath, 'w') as f:
             if sys.version_info >= (3,):
-                wr = csv.writer(f, quoting=csv.QUOTE_NONE, escapechar='\\')
+                wr = csv.writer(f, quoting=csv.QUOTE_ALL, escapechar='\\')
             else:
-                wr = UnicodeWriter(f, quoting=csv.QUOTE_NONE, escapechar='\\')
+                wr = UnicodeWriter(f, quoting=csv.QUOTE_ALL, escapechar='\\')
             wr.writerows(row_list)
     except IOError as e:
         logging.exception("Error writing csv file")

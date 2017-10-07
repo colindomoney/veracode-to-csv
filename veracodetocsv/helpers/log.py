@@ -8,7 +8,7 @@ from datetime import datetime
 now = datetime.utcnow().strftime("%Y-%m-%d-%H%M%S")
 logging_filename = now + ".log"
 format_string = "%(asctime)s %(levelname)s %(message)s"
-datetime_format = '%Y-%m-%d %H:%M:%S'
+datetime_format = '%Y-%m-%d %H:%M:%S %Z'
 
 logging.captureWarnings(True)
 

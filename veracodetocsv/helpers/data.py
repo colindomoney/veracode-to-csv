@@ -6,7 +6,8 @@ try:
     from StringIO import StringIO
 except ImportError:
     from io import BytesIO
-from datetime import datetime, timezone
+import pytz
+from datetime import datetime
 
 from helpers import models
 from helpers.exceptions import VeracodeError, VeracodeAPIError
@@ -79,7 +80,7 @@ class DataLoader:
         builds = []
         for build_element in build_elements:
             policy_updated_date_string = build_element.attrib["policy_updated_date"][:22] + build_element.attrib["policy_updated_date"][23:]
-            policy_updated_date = datetime.strptime(policy_updated_date_string, "%Y-%m-%dT%H:%M:%S%z").astimezone(timezone.utc)
+            policy_updated_date = datetime.strptime(policy_updated_date_string, "%Y-%m-%dT%H:%M:%S%z").astimezone(pytz.utc)
             if include_static_builds and "dynamic_scan_type" not in build_element.attrib:
                 builds.append(models.StaticBuild(build_element.attrib["build_id"], build_element.attrib["version"], policy_updated_date))
             if include_dynamic_builds and "dynamic_scan_type" in build_element.attrib:
@@ -108,7 +109,7 @@ class DataLoader:
         flaw_elements.sort(key=lambda flaw: int(flaw.attrib["issueid"]))
         flaws = []
         for flaw_element in flaw_elements:
-            date_first_occurrence = datetime.strptime(flaw_element.attrib["date_first_occurrence"], "%Y-%m-%d %H:%M:%S %Z").astimezone(timezone.utc)
+            date_first_occurrence = datetime.strptime(flaw_element.attrib["date_first_occurrence"], "%Y-%m-%d %H:%M:%S %Z").astimezone(pytz.utc)
             if build_type == "static":
                 flaws.append(models.StaticFlaw(flaw_element.attrib["issueid"], date_first_occurrence,
                                                flaw_element.attrib["severity"], flaw_element.attrib["cweid"],
@@ -138,7 +139,7 @@ class DataLoader:
                 analysis_unit_attrib = self._get_build_info(app.id, build.id).find("analysis_unit").attrib
                 if "published_date" in analysis_unit_attrib:
                     published_date_string = analysis_unit_attrib["published_date"][:22] + analysis_unit_attrib["published_date"][23:]
-                    build.published_date = datetime.strptime(published_date_string, "%Y-%m-%dT%H:%M:%S%z").astimezone(timezone.utc)
+                    build.published_date = datetime.strptime(published_date_string, "%Y-%m-%dT%H:%M:%S%z").astimezone(pytz.utc)
                 build.flaws = self._get_flaws(build.id, build.type)
             if include_sandboxes:
                 app.sandboxes = self._get_sandboxes(app.id)
@@ -148,7 +149,7 @@ class DataLoader:
                         analysis_unit_attrib = self._get_build_info(app.id, build.id, sandbox.id).find("analysis_unit").attrib
                         if "published_date" in analysis_unit_attrib:
                             published_date_string = analysis_unit_attrib["published_date"][:22] + analysis_unit_attrib["published_date"][23:]
-                            build.published_date = datetime.strptime(published_date_string, "%Y-%m-%dT%H:%M:%S%z").astimezone(timezone.utc)
+                            build.published_date = datetime.strptime(published_date_string, "%Y-%m-%dT%H:%M:%S%z").astimezone(pytz.utc)
                         build.flaws = self._get_flaws(build.id, build.type)
         return apps
 

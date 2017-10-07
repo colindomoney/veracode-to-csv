@@ -4,7 +4,7 @@ import logging
 from datetime import datetime
 
 
-now = datetime.now().strftime("%Y-%m-%d-%H%M%S")
+now = datetime.utcnow().strftime("%Y-%m-%d-%H%M%S")
 logging_filename = now + ".log"
 format_string = "%(asctime)s %(levelname)s %(message)s"
 

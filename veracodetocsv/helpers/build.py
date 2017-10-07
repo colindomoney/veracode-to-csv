@@ -5,7 +5,7 @@ import errno
 import logging
 from datetime import datetime
 
-from .exceptions import VeracodeError
+from helpers.exceptions import VeracodeError
 
 
 class BuildTools:
@@ -28,19 +28,18 @@ class BuildTools:
         if app_id not in self.processed_builds or build_id not in self.processed_builds[app_id]:
             return True
         else:
-            # Check if build policy update has occurred
-            xml_date_format = "%Y-%m-%dT%H:%M:%S"
             try:
-                current_build_policy_updated = datetime.strptime(build_policy_updated_date, xml_date_format)
-                last_build_policy_updated = datetime.strptime(self.processed_builds[app_id][build_id]["policy_updated_date"], xml_date_format)
+                last_build_policy_updated_string = self.processed_builds[app_id][build_id]["policy_updated_date"][:22]\
+                                                   + self.processed_builds[app_id][build_id]["policy_updated_date"][23:]
+                last_build_policy_updated_date = datetime.strptime(last_build_policy_updated_string, "%Y-%m-%d %H:%M:%S%z")
             except ValueError as e:
                 logging.exception("Error parsing date")
                 raise VeracodeError(e)
             else:
-                return current_build_policy_updated > last_build_policy_updated
+                return build_policy_updated_date > last_build_policy_updated_date
 
     def update_and_save_processed_builds_file(self, app_id, build_id, build_policy_updated_date):
-        build_data = {"policy_updated_date": build_policy_updated_date}
+        build_data = {"policy_updated_date": str(build_policy_updated_date)}
         if app_id not in self.processed_builds:
             self.processed_builds[app_id] = {build_id: build_data}
         else:

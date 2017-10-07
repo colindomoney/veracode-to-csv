@@ -13,7 +13,7 @@ import logging
 from requests.adapters import HTTPAdapter
 
 from veracode_api_signing.plugin_requests import RequestsAuthPluginVeracodeHMAC
-from .exceptions import VeracodeAPIError
+from helpers.exceptions import VeracodeAPIError
 
 
 class VeracodeAPI:

@@ -6,6 +6,12 @@
 # Directory to output .csv files
 output_directory = "output"
 
+# Save detailed report XML to reports directory
+# save_detailed_reports = True
+
+# Load detailed report XML from reports directory
+# load_detailed_reports = True
+
 # UTF-8 encoded file containing list of applications to include.
 # Note - an empty file will include all application profiles
 # app_include_list = "app_include_list.txt"

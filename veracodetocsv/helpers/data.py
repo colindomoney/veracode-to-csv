@@ -1,6 +1,9 @@
 # Purpose:  Convert Veracode XML elements to Python objects.
 
 import sys
+import os
+import errno
+import logging
 import xml.etree.ElementTree as ETree
 try:
     from StringIO import StringIO
@@ -96,12 +99,43 @@ class DataLoader:
         build_info_root_element = parse_and_remove_xml_namespaces(build_info_xml)
         return build_info_root_element.find("build")
         
-    def _get_flaws(self, build_id, build_type):
+    def _get_flaws(self, build_id, build_type, save_detailed_reports, load_detailed_reports):
         """Returns a list of flaws"""
-        try:
-            detailed_report_xml = self.api.get_detailed_report(build_id)
-        except VeracodeAPIError as e:
-            raise VeracodeError(e)
+        # TODO: make this DRY
+        if load_detailed_reports:
+            try:
+                with open("reports/" + build_id + ".xml", "rb") as f:
+                    detailed_report_xml = f.read()
+            except IOError as e:
+                if e.errno is errno.ENOENT:
+                    try:
+                        detailed_report_xml = self.api.get_detailed_report(build_id)
+                    except VeracodeAPIError as e:
+                        raise VeracodeError(e)
+                    if save_detailed_reports:
+                        try:
+                            if not os.path.exists("reports"):
+                                os.makedirs("reports")
+                            with open("reports/" + build_id + ".xml", "wb") as f:
+                                f.write(detailed_report_xml)
+                        except (OSError, IOError):
+                            logging.exception("Failed to save detailed report XML")
+                else:
+                    logging.exception("Failed to load detailed report XML")
+                    raise VeracodeError(e)
+        else:
+            try:
+                detailed_report_xml = self.api.get_detailed_report(build_id)
+            except VeracodeAPIError as e:
+                raise VeracodeError(e)
+            if save_detailed_reports:
+                try:
+                    if not os.path.exists("reports"):
+                        os.makedirs("reports")
+                    with open("reports/" + build_id + ".xml", "wb") as f:
+                        f.write(detailed_report_xml)
+                except (OSError, IOError):
+                    logging.exception("Failed to save detailed report XML")
         detailed_report_root_element = parse_and_remove_xml_namespaces(detailed_report_xml)
         # Use xpath to find all flaws in the detailed report
         findall_string = "severity/category/cwe/" + build_type + "flaws/flaw"
@@ -123,9 +157,17 @@ class DataLoader:
                                                 flaw_element.attrib["categoryname"], flaw_element.attrib["affects_policy_compliance"],
                                                 flaw_element.attrib["remediationeffort"], flaw_element.attrib["remediation_status"],
                                                 flaw_element.attrib["mitigation_status_desc"], flaw_element.attrib["url"]))
-        return flaws
+        if build_type == "static":
+            static_analysis_element = detailed_report_root_element.find("static-analysis")
+            analysis_size_bytes = None
+            if static_analysis_element is not None:
+                analysis_size_bytes = static_analysis_element.attrib["analysis_size_bytes"]
+            return flaws, analysis_size_bytes
+        else:
+            return flaws
 
-    def get_data(self, include_static_builds=True, include_dynamic_builds=True, app_include_list=None, include_sandboxes=False):
+    def get_data(self, include_static_builds=True, include_dynamic_builds=True, app_include_list=None,
+                 include_sandboxes=False, save_detailed_reports=False, load_detailed_reports=False):
         """Returns a list of populated apps"""
         apps = self._get_apps()
         if app_include_list:
@@ -140,7 +182,10 @@ class DataLoader:
                 if "published_date" in analysis_unit_attrib:
                     published_date_string = analysis_unit_attrib["published_date"][:22] + analysis_unit_attrib["published_date"][23:]
                     build.published_date = datetime.strptime(published_date_string, "%Y-%m-%dT%H:%M:%S%z").astimezone(pytz.utc)
-                build.flaws = self._get_flaws(build.id, build.type)
+                if build.type == "static":
+                    build.flaws, build.analysis_size_bytes = self._get_flaws(build.id, build.type, save_detailed_reports, load_detailed_reports)
+                else:
+                    build.flaws = self._get_flaws(build.id, build.type, save_detailed_reports, load_detailed_reports)
             if include_sandboxes:
                 app.sandboxes = self._get_sandboxes(app.id)
                 for sandbox in app.sandboxes:
@@ -150,14 +195,15 @@ class DataLoader:
                         if "published_date" in analysis_unit_attrib:
                             published_date_string = analysis_unit_attrib["published_date"][:22] + analysis_unit_attrib["published_date"][23:]
                             build.published_date = datetime.strptime(published_date_string, "%Y-%m-%dT%H:%M:%S%z").astimezone(pytz.utc)
-                        build.flaws = self._get_flaws(build.id, build.type)
+                        build.flaws, build.analysis_size_bytes = self._get_flaws(build.id, build.type, save_detailed_reports, load_detailed_reports)
         return apps
 
     def get_headers(self, build_type, include_sandbox=False):
         """Returns headers for a csv file"""
-        headers = ["app_" + header for header in models.App.to_headers()] + ["build_" + header for header in models.Build.to_headers()]
-        flaw_headers = models.StaticFlaw.to_headers() if build_type == "static" else models.DynamicFlaw.to_headers()
-        headers += ["flaw_" + header for header in flaw_headers]
+        app_headers = ["app_" + header for header in models.App.to_headers()]
+        build_headers = ["build_" + header for header in (models.StaticBuild.to_headers() if build_type == "static" else models.DynamicBuild.to_headers())]
+        flaw_headers = ["flaw_" + header for header in(models.StaticFlaw.to_headers() if build_type == "static" else models.DynamicFlaw.to_headers())]
+        headers = app_headers + build_headers + flaw_headers
         if include_sandbox:
             headers += ["sandbox_" + header for header in models.Sandbox.to_headers()]
         return headers

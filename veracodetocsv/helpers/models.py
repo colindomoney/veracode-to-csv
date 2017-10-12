@@ -103,13 +103,14 @@ class Build(object):
 
 class StaticBuild(Build):
     """A class that represents a static analysis build"""
-    def __init__(self, id, name, policy_updated_date, published_date=None, flaws=None):
+    def __init__(self, id, name, policy_updated_date, published_date=None, analysis_size_bytes=None, flaws=None):
         super(StaticBuild, self).__init__(id, name, policy_updated_date, published_date, flaws)
         self.type = "static"
+        self.analysis_size_bytes = analysis_size_bytes
 
     @classmethod
     def to_headers(cls):
-        return super(StaticBuild, cls).to_headers()
+        return super(StaticBuild, cls).to_headers() + ["analysis_size_bytes"]
 
     def to_list(self):
         return [getattr(self, key) for key in StaticBuild.to_headers()]

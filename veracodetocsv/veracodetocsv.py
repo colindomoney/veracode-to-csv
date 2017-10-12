@@ -27,6 +27,8 @@ def main():
     output_directory = getattr(config, "output_directory", "output")
     proxies = getattr(config, "proxies", None)
     debug_logging = getattr(config, "debug_logging", False)
+    save_detailed_reports = getattr(config, "save_detailed_reports", False)
+    load_detailed_reports = getattr(config, "load_detailed_reports", False)
 
     log.setup_logging(debug_logging)
 
@@ -63,7 +65,8 @@ def main():
         app_include_list = []
 
     try:
-        data = data_loader.get_data(include_static_builds, include_dynamic_builds, app_include_list, include_sandboxes)
+        data = data_loader.get_data(include_static_builds, include_dynamic_builds, app_include_list,
+                                    include_sandboxes, save_detailed_reports, load_detailed_reports)
     except VeracodeError:
         print("Failed to get app data, check log file for details.")
         sys.exit(2)

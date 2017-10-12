@@ -59,8 +59,8 @@ Configuration is done in config.py
 
     python veracodetocsv/veracodetocsv.py
     
-A text file `processed_builds.txt` keeps track of which builds have been successfully processed.
+A text file `processed_builds.txt` keeps track of which builds have been successfully processed. Delete this file to regenerate all CSVs.
 
 # Splunk
 
-An example Splunk dashboard is included in XML format.
+`\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}","` can be used as a TIME_PREFIX in props.conf to extract the build_published_date as an event timestamp

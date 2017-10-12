@@ -1,4 +1,5 @@
 output/
+reports/
 processed_builds.txt
 app_include_list.txt
 *.log

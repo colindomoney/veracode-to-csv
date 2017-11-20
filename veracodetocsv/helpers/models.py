@@ -82,17 +82,19 @@ class DynamicFlaw(Flaw):
 
 class Build(object):
     """A class that represents a build"""
-    def __init__(self, id, name, policy_updated_date, published_date=None, flaws=None):
+    def __init__(self, id, name, policy_updated_date, submitter=None, policy=None, published_date=None, flaws=None):
         self.id = id
         self.name = name
         self.policy_updated_date = policy_updated_date
+        self.submitter = submitter
+        self.policy = policy
         self.published_date = published_date
         self.flaws = flaws
         self.type = None
 
     @classmethod
     def to_headers(cls):
-        return ["id", "name", "type", "policy_updated_date", "published_date"]
+        return ["id", "name", "type", "policy_updated_date", "published_date", "submitter", "policy"]
 
     def to_list(self):
         return [getattr(self, key) for key in Build.to_headers()]
@@ -103,8 +105,8 @@ class Build(object):
 
 class StaticBuild(Build):
     """A class that represents a static analysis build"""
-    def __init__(self, id, name, policy_updated_date, published_date=None, analysis_size_bytes=None, flaws=None):
-        super(StaticBuild, self).__init__(id, name, policy_updated_date, published_date, flaws)
+    def __init__(self, id, name, policy_updated_date, submitter=None, policy=None, published_date=None, analysis_size_bytes=None, flaws=None):
+        super(StaticBuild, self).__init__(id, name, policy_updated_date, submitter, policy, published_date, flaws)
         self.type = "static"
         self.analysis_size_bytes = analysis_size_bytes
 
@@ -121,8 +123,8 @@ class StaticBuild(Build):
 
 class DynamicBuild(Build):
     """A class that represents a dynamic analysis build"""
-    def __init__(self, id, name, policy_updated_date, published_date=None, flaws=None):
-        super(DynamicBuild, self).__init__(id, name, policy_updated_date, published_date, flaws)
+    def __init__(self, id, name, policy_updated_date, submitter=None, policy=None, published_date=None, flaws=None):
+        super(DynamicBuild, self).__init__(id, name, policy_updated_date, submitter, policy, published_date, flaws)
         self.type = "dynamic"
 
     @classmethod

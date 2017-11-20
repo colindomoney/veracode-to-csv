@@ -23,14 +23,14 @@ def test_sandbox_model():
 
 
 def test_dynamic_build_model():
-    build = models.DynamicBuild("1", "test-build", "2017-01-01T00:00:00")
+    build = models.DynamicBuild("1", "test-build", "2017-01-01T00:00:00+0000")
 
     assert build.id == "1"
     assert build.name == "test-build"
     assert build.policy_updated_date == "2017-01-01T00:00:00"
     assert build.type == "dynamic"
-    assert build.to_headers() == ["id", "name", "type", "policy_updated_date", "published_date"]
-    assert build.to_list() == ["1", "test-build", "dynamic", "2017-01-01T00:00:00", None]
+    assert build.to_headers() == ["id", "name", "type", "policy_updated_date", "published_date", "submitter", "policy"]
+    assert build.to_list() == ["1", "test-build", "dynamic", "2017-01-01T00:00:00", None, None, None]
 
 
 def test_static_build_model():
@@ -40,8 +40,8 @@ def test_static_build_model():
     assert build.name == "test-build"
     assert build.policy_updated_date == "2017-01-01T00:00:00"
     assert build.type == "static"
-    assert build.to_headers() == ["id", "name", "type", "policy_updated_date", "published_date", "analysis_size_bytes"]
-    assert build.to_list() == ["1", "test-build", "static", "2017-01-01T00:00:00", None, None]
+    assert build.to_headers() == ["id", "name", "type", "policy_updated_date", "published_date", "submitter", "policy", "analysis_size_bytes"]
+    assert build.to_list() == ["1", "test-build", "static", "2017-01-01T00:00:00", None, None, None, None]
 
 
 def test_dynamic_flaw_model():

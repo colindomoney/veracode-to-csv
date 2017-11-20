@@ -1,16 +1,16 @@
 # Purpose:  Config file for veracode_to_csv.py
 
 # Logging
-# debug_logging = True
+debug_logging = True
 
 # Directory to output .csv files
 output_directory = "output"
 
 # Save detailed report XML to reports directory
-# save_detailed_reports = True
+save_detailed_reports = True
 
 # Load detailed report XML from reports directory
-# load_detailed_reports = True
+load_detailed_reports = True
 
 # UTF-8 encoded file containing list of applications to include.
 # Note - an empty file will include all application profiles

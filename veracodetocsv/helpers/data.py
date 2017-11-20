@@ -82,12 +82,14 @@ class DataLoader:
         build_elements = [build_element for build_element in build_elements if "policy_updated_date" in build_element.attrib]
         builds = []
         for build_element in build_elements:
+            # TODO: move build_should_be_processed here?
             policy_updated_date_string = build_element.attrib["policy_updated_date"][:22] + build_element.attrib["policy_updated_date"][23:]
             policy_updated_date = datetime.strptime(policy_updated_date_string, "%Y-%m-%dT%H:%M:%S%z").astimezone(pytz.utc)
             if include_static_builds and "dynamic_scan_type" not in build_element.attrib:
                 builds.append(models.StaticBuild(build_element.attrib["build_id"], build_element.attrib["version"], policy_updated_date))
             if include_dynamic_builds and "dynamic_scan_type" in build_element.attrib:
                 builds.append(models.DynamicBuild(build_element.attrib["build_id"], build_element.attrib["version"], policy_updated_date))
+        builds.sort(key=lambda build: int(build.id))
         return builds
 
     def _get_build_info(self, app_id, build_id, sandbox_id=None):
@@ -172,17 +174,25 @@ class DataLoader:
         apps = self._get_apps()
         if app_include_list:
             apps = [app for app in apps if app.name in app_include_list]
+        apps.sort(key=lambda app: int(app.id))
         for app in apps:
             app_info = self._get_app_info(app.id)
             app.business_unit = app_info["business_unit"]
             builds = self._get_builds(app.id, include_static_builds, include_dynamic_builds)
             app.builds = [build for build in builds if self.build_tools.build_should_be_processed(app.id, build.id, build.policy_updated_date)]
-            for build in app.builds:
-                analysis_unit_attrib = self._get_build_info(app.id, build.id).find("analysis_unit").attrib
+            # TODO: make this DRY
+            for index, build in enumerate(app.builds):
+                build_info_element = self._get_build_info(app.id, build.id)
+                build.submitter = build_info_element.attrib["submitter"]
+                build.policy = build_info_element.attrib["policy_name"] + " v" + build_info_element.attrib["policy_version"]
+                analysis_unit_attrib = build_info_element.find("analysis_unit").attrib
                 if "published_date" in analysis_unit_attrib:
                     published_date_string = analysis_unit_attrib["published_date"][:22] + analysis_unit_attrib["published_date"][23:]
                     build.published_date = datetime.strptime(published_date_string, "%Y-%m-%dT%H:%M:%S%z").astimezone(pytz.utc)
                 if build.type == "static":
+                    # TODO: need to separate out static and dynamic processing for this to work on policy builds
+                    # if index == len(app.builds) - 1:
+                    #     load_detailed_reports = False
                     build.flaws, build.analysis_size_bytes = self._get_flaws(build.id, build.type, save_detailed_reports, load_detailed_reports)
                 else:
                     build.flaws = self._get_flaws(build.id, build.type, save_detailed_reports, load_detailed_reports)
@@ -190,11 +200,16 @@ class DataLoader:
                 app.sandboxes = self._get_sandboxes(app.id)
                 for sandbox in app.sandboxes:
                     sandbox.builds = self._get_builds(app.id, include_static_builds, include_dynamic_builds, sandbox.id)
-                    for build in sandbox.builds:
-                        analysis_unit_attrib = self._get_build_info(app.id, build.id, sandbox.id).find("analysis_unit").attrib
+                    for index, build in enumerate(sandbox.builds):
+                        build_info_element = self._get_build_info(app.id, build.id)
+                        build.submitter = build_info_element.attrib["submitter"]
+                        build.policy = build_info_element.attrib["policy_name"] + " v" + build_info_element.attrib["policy_version"]
+                        analysis_unit_attrib = build_info_element.find("analysis_unit").attrib
                         if "published_date" in analysis_unit_attrib:
                             published_date_string = analysis_unit_attrib["published_date"][:22] + analysis_unit_attrib["published_date"][23:]
                             build.published_date = datetime.strptime(published_date_string, "%Y-%m-%dT%H:%M:%S%z").astimezone(pytz.utc)
+                        if index == len(app.builds) - 1:
+                            load_detailed_reports = False
                         build.flaws, build.analysis_size_bytes = self._get_flaws(build.id, build.type, save_detailed_reports, load_detailed_reports)
         return apps
 

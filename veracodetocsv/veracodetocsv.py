@@ -91,7 +91,7 @@ def main():
             else:
                 flaw_rows.append(app.to_list() + build.to_list() + flaw.to_list() + sandbox.to_list())
         filepath = make_filepath(app, build, sandbox)
-        unicodecsv.create_csv(flaw_rows, filepath)
+        unicodecsv.write_csv(flaw_rows, filepath)
         build_tools.update_and_save_processed_builds_file(app.id, build.id, build.policy_updated_date)
 
     builds_processed = 0

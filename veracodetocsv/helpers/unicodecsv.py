@@ -39,7 +39,7 @@ class UnicodeWriter:
             self.writerow(row)
 
 
-def create_csv(row_list, filepath):
+def write_csv(row_list, filepath):
     """Create a new CSV file from a list of rows."""
     try:
         with open(filepath, 'w') as f:

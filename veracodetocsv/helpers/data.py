@@ -79,12 +79,15 @@ class DataLoader:
         build_list_root_element = parse_and_remove_xml_namespaces(build_list_xml)
         build_elements = build_list_root_element.findall("build")
         # Filter out incomplete builds
-        build_elements = [build_element for build_element in build_elements if "policy_updated_date" in build_element.attrib]
+        # build_elements = [build_element for build_element in build_elements if "policy_updated_date" in build_element.attrib]
         builds = []
         for build_element in build_elements:
             # TODO: move build_should_be_processed here?
-            policy_updated_date_string = build_element.attrib["policy_updated_date"][:22] + build_element.attrib["policy_updated_date"][23:]
-            policy_updated_date = datetime.strptime(policy_updated_date_string, "%Y-%m-%dT%H:%M:%S%z").astimezone(pytz.utc)
+            if sandbox_id is None:
+                policy_updated_date_string = build_element.attrib["policy_updated_date"][:22] + build_element.attrib["policy_updated_date"][23:]
+                policy_updated_date = datetime.strptime(policy_updated_date_string, "%Y-%m-%dT%H:%M:%S%z").astimezone(pytz.utc)
+            else:
+                policy_updated_date = None
             if include_static_builds and "dynamic_scan_type" not in build_element.attrib:
                 builds.append(models.StaticBuild(build_element.attrib["build_id"], build_element.attrib["version"], policy_updated_date))
             if include_dynamic_builds and "dynamic_scan_type" in build_element.attrib:
@@ -208,6 +211,7 @@ class DataLoader:
                         if "published_date" in analysis_unit_attrib:
                             published_date_string = analysis_unit_attrib["published_date"][:22] + analysis_unit_attrib["published_date"][23:]
                             build.published_date = datetime.strptime(published_date_string, "%Y-%m-%dT%H:%M:%S%z").astimezone(pytz.utc)
+                            build.policy_updated_date = build.published_date
                         if index == len(app.builds) - 1:
                             load_detailed_reports = False
                         build.flaws, build.analysis_size_bytes = self._get_flaws(build.id, build.type, save_detailed_reports, load_detailed_reports)
